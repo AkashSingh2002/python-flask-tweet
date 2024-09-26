@@ -1,0 +1,10 @@
+from pymongo import MongoClient
+
+# Create a MongoDB client
+client = MongoClient('mongodb://localhost:27017/')
+
+# Get a reference to the database
+db = client['mydatabase']
+
+# Get a reference to the tweets collection
+tweets = db['tweets']
