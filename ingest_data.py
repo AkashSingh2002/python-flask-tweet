@@ -2,7 +2,7 @@ import pandas as pd
 import dask.dataframe as dd
 from tweet_analyzer import TweetAnalyzer
 
-# Read the larger TSV file (500MB)
+# Read the small TSV file (50MB)
 dtype = {'hashtags': 'object',
          'media_keys': 'object',
          'place_id': 'object',

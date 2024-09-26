@@ -1,34 +1,22 @@
-from flask import Flask, request, jsonify
-from pymongo import MongoClient
-import pandas as pd
+from flask import Flask, request, jsonify, render_template
 from tweet_analyzer import TweetAnalyzer
 
 app = Flask(__name__)
 
-# Create a MongoDB client
-client = MongoClient('mongodb://localhost:27017/')
+# Load the data from disk
+tweet_analyzer = TweetAnalyzer.load_from_disk('data.pkl')
 
-# Get a reference to the database
-db = client['mydatabase']
+# Render the search page
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-# Get a reference to the tweets collection
-tweets = db['tweets']
+# Handle form submission and display results
+@app.route('/query', methods=['POST'])
+def query():
+    term = request.form.get('term')  # Get the search term from the form
+    results = tweet_analyzer.query_term(term)
+    return render_template('index.html', term=term, results=results)
 
-try:
-    # Convert the MongoDB collection to a Pandas DataFrame
-    df = pd.DataFrame(list(tweets.find()))
-except Exception as e:
-    print(f"Error: {e}")
-    df = None
-
-if df is not None:
-    tweet_analyzer = TweetAnalyzer(df)
-
-    @app.route('/query', methods=['GET'])
-    def query_tweets():
-        term = request.args.get('term')
-        results = tweet_analyzer.query_term(term)
-        return jsonify(results)
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
